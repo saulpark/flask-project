@@ -1,10 +1,48 @@
 {% extends "base.html" %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="welcome">
-    <h1>Hello World!</h1>
-    <p>Welcome to my first Flask application.</p>
+<div class="hero">
+    <h1>Welcome to Flask Notes App</h1>
+    <p>A note-taking application with user management and sharing capabilities.</p>
+</div>
+
+<div class="quick-actions">
+    <h2>Quick Actions</h2>
+
+    <div class="action-section">
+        <h3>📝 Notes</h3>
+        <ul>
+            <li><a href="{{ url_for('notes.new_note') }}">Create New Note</a> - Start writing</li>
+            <li><a href="{{ url_for('notes.list_notes') }}">View All Notes</a> - See your notes</li>
+        </ul>
+    </div>
+
+    <div class="action-section">
+        <h3>👤 Users</h3>
+        <ul>
+            <li><a href="{{ url_for('users.new_user') }}">Create New User</a> - Register account</li>
+            <li><a href="{{ url_for('users.list_users') }}">View All Users</a> - Browse users</li>
+        </ul>
+    </div>
+
+    <div class="action-section">
+        <h3>ℹ️ Information</h3>
+        <ul>
+            <li><a href="{{ url_for('main.about') }}">About</a> - Learn about this app</li>
+        </ul>
+    </div>
+</div>
+
+<div class="features">
+    <h2>Features</h2>
+    <ul>
+        <li>✅ Create, read, update, and delete notes</li>
+        <li>✅ User management with password protection</li>
+        <li>✅ Share notes publicly with unique tokens</li>
+        <li>✅ SQLite database with persistence</li>
+        <li>✅ Docker support for easy deployment</li>
+    </ul>
 </div>
 {% endblock %}

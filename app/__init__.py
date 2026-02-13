@@ -18,4 +18,7 @@ def create_app():
     from app.notes import bp as notes_bp
     app.register_blueprint(notes_bp)
 
+    from app.users import bp as users_bp
+    app.register_blueprint(users_bp)
+
     return app
