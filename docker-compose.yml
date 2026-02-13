@@ -1,17 +1,23 @@
+version: '3.8'
+
 services:
   web:
     build: .
-    container_name: flask-notes-app
     ports:
       - "5000:5000"
     volumes:
       - ./instance:/app/instance
-      - ./app:/app/app
     environment:
-      - FLASK_ENV=production
-      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
-      - DATABASE_URL=sqlite:////app/instance/notes.db
-    command: >
-      sh -c "python -c 'from app import create_app; from app.extensions import db; app = create_app(); app.app_context().push(); db.create_all(); print(\"Database initialized\")' &&
-             gunicorn --bind 0.0.0.0:5000 --workers 4 --timeout 120 --reload run:app"
-    restart: unless-stopped
+      - FLASK_APP=run.py
+      - PYTHONUNBUFFERED=1
+    command: python run.py
+
+  sqlite-web:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./instance:/app/instance
+    command: sqlite_web --host 0.0.0.0 --port 8080 instance/app.db
+    depends_on:
+      - web
