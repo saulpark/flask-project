@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+Keep your replies extremly concice and focus on conveying the key information. No unnecessary fluff, no long code snippets.
+
 ## Project Overview
 
 This is a Flask web application currently serving a "Hello World" page, with plans to evolve into a full-featured note-taking application with rich-text editing, user authentication, and public sharing capabilities. See `TECH-SPEC.MD` for the complete technical specification of the planned features.
