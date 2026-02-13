@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="about">
+    <h2>About This Project</h2>
+    <p>This is a Flask web application built with Python.</p>
+
+    <h3>Tech Stack:</h3>
+    <ul>
+        <li>Python 3.x</li>
+        <li>Flask 3.0</li>
+        <li>Jinja2 Templates</li>
+    </ul>
+
+    <h3>Getting Started:</h3>
+    <ol>
+        <li>Create a virtual environment: <code>python -m venv venv</code></li>
+        <li>Activate it: <code>venv\Scripts\activate</code> (Windows) or <code>source venv/bin/activate</code> (Unix)</li>
+        <li>Install dependencies: <code>pip install -r requirements.txt</code></li>
+        <li>Run the app: <code>python run.py</code></li>
+    </ol>
+</div>
+{% endblock %}
