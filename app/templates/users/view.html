@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.email }}{% endblock %}
+
+{% block content %}
+<h2>User Profile</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="user-details">
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>User ID:</strong> {{ user.id }}</p>
+    <p><strong>Created:</strong> {{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+    <p><strong>Last Updated:</strong> {{ user.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+    <p><strong>Total Notes:</strong> {{ note_count }}</p>
+</div>
+
+<div class="user-actions">
+    <a href="{{ url_for('users.edit_password', id=user.id) }}" class="btn btn-primary">Change Password</a>
+
+    <form method="POST" action="{{ url_for('users.delete_user', id=user.id) }}" style="display:inline;">
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this user and all their notes?')">Delete User</button>
+    </form>
+
+    <a href="{{ url_for('users.list_users') }}" class="btn btn-secondary">Back to Users</a>
+</div>
+
+{% if user.notes %}
+<div class="user-notes">
+    <h3>User's Notes</h3>
+    <ul>
+        {% for note in user.notes %}
+        <li>
+            <a href="{{ url_for('notes.view_note', id=note.id) }}">
+                {{ note.title or 'Untitled' }}
+            </a>
+            - Updated: {{ note.updated_at.strftime('%Y-%m-%d %H:%M') }}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% endblock %}

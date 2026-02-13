@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+<h2>Users</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<a href="{{ url_for('users.new_user') }}" class="btn btn-primary">Create New User</a>
+
+{% if users %}
+<table class="users-table">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Created</th>
+            <th>Notes</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>
+                <a href="{{ url_for('users.view_user', id=user.id) }}">
+                    {{ user.email }}
+                </a>
+            </td>
+            <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>{{ user.notes|length }}</td>
+            <td>
+                <a href="{{ url_for('users.view_user', id=user.id) }}">View</a> |
+                <a href="{{ url_for('users.edit_password', id=user.id) }}">Change Password</a> |
+                <form method="POST" action="{{ url_for('users.delete_user', id=user.id) }}" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Delete this user and all their notes?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No users yet. <a href="{{ url_for('users.new_user') }}">Create the first user!</a></p>
+{% endif %}
+{% endblock %}
