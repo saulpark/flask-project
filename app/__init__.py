@@ -15,4 +15,7 @@ def create_app():
     from app.routes import bp
     app.register_blueprint(bp)
 
+    from app.notes import bp as notes_bp
+    app.register_blueprint(notes_bp)
+
     return app
