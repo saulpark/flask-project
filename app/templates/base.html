@@ -12,6 +12,8 @@
             <h1>Flask App</h1>
             <ul>
                 <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li><a href="{{ url_for('notes.list_notes') }}">My Notes</a></li>
+                <li><a href="{{ url_for('notes.new_note') }}">New Note</a></li>
                 <li><a href="{{ url_for('main.about') }}">About</a></li>
             </ul>
         </div>

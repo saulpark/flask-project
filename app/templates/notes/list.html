@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}My Notes{% endblock %}
+
+{% block content %}
+<h2>My Notes</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<a href="{{ url_for('notes.new_note') }}" class="btn btn-primary">Create New Note</a>
+
+{% if notes %}
+<table class="notes-table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Updated</th>
+            <th>Shared</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for note in notes %}
+        <tr>
+            <td>
+                <a href="{{ url_for('notes.view_note', id=note.id) }}">
+                    {{ note.title or 'Untitled' }}
+                </a>
+            </td>
+            <td>{{ note.updated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>{{ 'Yes' if note.is_shared else 'No' }}</td>
+            <td>
+                <a href="{{ url_for('notes.view_note', id=note.id) }}">View</a> |
+                <a href="{{ url_for('notes.edit_note', id=note.id) }}">Edit</a> |
+                <form method="POST" action="{{ url_for('notes.delete_note', id=note.id) }}" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Delete this note?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No notes yet. <a href="{{ url_for('notes.new_note') }}">Create your first note!</a></p>
+{% endif %}
+{% endblock %}
