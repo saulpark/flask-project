@@ -1,6 +1,6 @@
 # Flask Note-Taking Application
 
-A Flask web application with SQLAlchemy models, service layer architecture, and comprehensive testing. Features user management and note-taking capabilities with rich-text support (planned).
+A Flask web application for creating and managing notes with user authentication, public sharing via unique tokens, and a Bootstrap 5 UI.
 
 ## Project Structure
 
@@ -8,90 +8,92 @@ A Flask web application with SQLAlchemy models, service layer architecture, and 
 flask-project/
 ├── app/
 │   ├── __init__.py              # Application factory
-│   ├── extensions.py            # Database and extension instances
-│   ├── routes.py                # Main blueprint routes
+│   ├── extensions.py            # db, login_manager, csrf instances
+│   ├── routes.py                # Main blueprint (Home, About)
+│   ├── auth/
+│   │   ├── __init__.py          # Auth blueprint definition
+│   │   ├── routes.py            # Login, register, logout
+│   │   └── forms.py             # LoginForm, RegisterForm (WTForms)
 │   ├── models/
-│   │   ├── __init__.py
+│   │   ├── __init__.py          # Re-exports User, Note
 │   │   ├── user.py              # User model with authentication
 │   │   └── note.py              # Note model with sharing
+│   ├── notes/
+│   │   ├── __init__.py          # Notes blueprint definition
+│   │   ├── routes.py            # CRUD + share/unshare + public view
+│   │   └── services.py          # NoteService business logic
+│   ├── users/
+│   │   ├── __init__.py          # Users blueprint definition
+│   │   └── routes.py            # User management routes
 │   ├── services/
 │   │   ├── __init__.py
-│   │   └── user_service.py      # User CRUD operations
-│   ├── notes/
-│   │   ├── __init__.py
-│   │   ├── routes.py            # Note routes (planned)
-│   │   └── services.py          # Note CRUD operations
-│   ├── static/
-│   │   ├── css/
-│   │   │   └── style.css        # Stylesheets
-│   │   └── js/                  # JavaScript files
-│   └── templates/
-│       ├── base.html            # Base template
-│       ├── index.html           # Home page
-│       └── about.html           # About page
+│   │   └── user_service.py      # UserService (create, authenticate, etc.)
+│   ├── templates/
+│   │   ├── base.html            # Bootstrap 5 layout, nav, flash messages
+│   │   ├── index.html           # Home page
+│   │   ├── about.html           # About page
+│   │   ├── auth/                # login.html, register.html
+│   │   ├── notes/               # list, new, edit, view, public
+│   │   └── users/               # list, new, view, password
+│   └── static/
+│       └── css/style.css        # Minimal custom CSS
 ├── tests/
+│   ├── __init__.py
 │   ├── test_user_service.py     # User service tests
 │   └── test_notes_service.py    # Notes service tests
 ├── instance/                    # SQLite database location
 ├── run.py                       # Application entry point
-├── requirements.txt             # Python dependencies
-├── Dockerfile                   # Docker container definition
-├── docker-compose.yml           # Multi-container Docker setup
-├── .dockerignore               # Docker ignore rules
-├── .env.example                # Environment variables template
-├── .gitignore                  # Git ignore rules
-├── CLAUDE.md                   # AI assistant guidance
-└── TECH-SPEC.MD                # Technical specification
+├── requirements.txt             # Pinned Python dependencies
+├── Dockerfile
+├── docker-compose.yml
+├── .dockerignore
+├── .env.example                 # Environment variables template
+├── .gitignore
+├── CLAUDE.md                    # AI assistant guidance
+├── TECH-SPEC.MD                 # Technical specification
+├── AUDIT.md                     # Codebase audit findings
+└── README.docker.md             # Docker-specific documentation
 ```
 
-## Setup Instructions
+## Setup
 
-### 1. Create a Virtual Environment
+### 1. Create and activate a virtual environment
 
 ```bash
 python -m venv venv
-```
 
-### 2. Activate the Virtual Environment
-
-**Windows:**
-```bash
+# Windows:
 venv\Scripts\activate
-```
 
-**macOS/Linux:**
-```bash
+# macOS/Linux:
 source venv/bin/activate
 ```
 
-### 3. Install Dependencies
+### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Set Up Environment Variables (Optional)
-
-Copy the example environment file and update it with your settings:
+### 3. Set up environment variables (optional)
 
 ```bash
 copy .env.example .env
 ```
 
-### 5. Run the Application
+### 4. Run the application
 
 ```bash
 python run.py
 ```
 
-The application will be available at `http://localhost:5000`
+The app runs at `http://localhost:5000` in debug mode.
 
-### 6. Initialize the Database
+### 5. Initialize the database
 
-```bash
-# Create database tables
-flask db upgrade
-# Or run Python and create tables manually
+Tables are not yet auto-created. Run manually:
+
+```python
 python
 >>> from app import create_app
 >>> from app.extensions import db
@@ -102,21 +104,25 @@ python
 
 ## Features
 
-- **Application factory pattern** for better organization
-- **SQLAlchemy ORM** with User and Note models
-- **Service layer architecture** for business logic separation
-- **User authentication** with password hashing (Werkzeug)
-- **Note management** with sharing capabilities via tokens
-- **Comprehensive testing** with pytest and pytest-mock
-- **Database migrations** support (Flask-Migrate)
-- **Template inheritance** with Jinja2
-- **Static files support** (CSS, JavaScript)
-- **Docker support** with SQLite Web UI (sqlite-web)
-- Clean, modular project structure
+- **User authentication** — email/password login with session-based auth (Flask-Login)
+- **Notes CRUD** — create, view, edit, delete notes
+- **Public sharing** — share notes via unique token URLs, toggle on/off
+- **CSRF protection** — all POST forms protected via Flask-WTF CSRFProtect
+- **Bootstrap 5 UI** — responsive layout with Bootstrap Icons
+- **Service layer architecture** — business logic separated from routes
+- **Docker support** — with SQLite Web UI for database inspection
 
-## Docker Usage
+## Current Limitations
 
-### Quick Start with Docker Compose (Recommended)
+See [AUDIT.md](AUDIT.md) for the full list. Key items:
+
+- Note ownership is not enforced (any user can access any note)
+- Users blueprint has no authorization (any user can manage all users)
+- Quill.js rich-text editor not yet integrated (using plain textarea)
+- Flask-Migrate not yet wired up
+- `SECRET_KEY` is hardcoded (not env-based)
+
+## Docker
 
 ```bash
 # Start both Flask app and SQLite Web UI
@@ -125,86 +131,23 @@ docker-compose up
 # Run in background
 docker-compose up -d
 
-# Stop services
+# Stop
 docker-compose down
 ```
 
-**Access:**
 - Flask App: `http://localhost:5000`
 - SQLite Web UI: `http://localhost:8080`
 
-### Build and Run with Docker (Manual)
-
-```bash
-# Build the image
-docker build -t flask-notes-app .
-
-# Run the Flask container
-docker run -p 5000:5000 -v $(pwd)/instance:/app/instance flask-notes-app
-
-# Run sqlite-web in a separate container
-docker run -p 8080:8080 -v $(pwd)/instance:/app/instance flask-notes-app \
-  sqlite_web --host 0.0.0.0 --port 8080 instance/app.db
-```
-
-### SQLite Web UI Features
-
-The SQLite Web UI (port 8080) provides:
-- Browse tables and view data
-- Execute SQL queries with syntax highlighting
-- Export data to CSV/JSON
-- View table schemas and indexes
-- Read-only mode available for safety
-
-## Database Models
-
-### User Model
-- Email-based authentication with password hashing
-- One-to-many relationship with notes
-- Timestamps for created_at and updated_at
-
-### Note Model
-- Title and content (Quill Delta JSON format)
-- Sharing functionality with unique tokens
-- Foreign key relationship to User
-- Timestamps for created_at and updated_at
+See [README.docker.md](README.docker.md) for more Docker details.
 
 ## Testing
 
-Run the test suite:
-
 ```bash
-# Run all tests
 pytest
-
-# Run with coverage
 pytest --cov=app
-
-# Run specific test file
 pytest tests/test_user_service.py
 ```
 
-## Development
+## Tech Spec
 
-- **Routes**: Edit in [app/routes.py](app/routes.py) or blueprint-specific routes
-- **Models**: Add/modify in [app/models/](app/models/)
-- **Services**: Business logic in [app/services/](app/services/) and [app/notes/services.py](app/notes/services.py)
-- **Templates**: Add in [app/templates/](app/templates/)
-- **Static files**: CSS, JS, images in [app/static/](app/static/)
-- **Configuration**: App factory in [app/__init__.py](app/__init__.py)
-
-## Service Layer
-
-The application uses a service layer pattern for business logic:
-
-- **UserService** (`app/services/user_service.py`): User CRUD operations
-- **NotesService** (`app/notes/services.py`): Note CRUD operations with sharing
-
-## Next Steps
-
-- [ ] Implement authentication routes and forms
-- [ ] Add Quill.js rich-text editor integration
-- [ ] Create note management UI
-- [ ] Add public note sharing views
-- [ ] Implement CSRF protection with Flask-WTF
-- [ ] Add production configuration
+See [TECH-SPEC.MD](TECH-SPEC.MD) for the full technical specification and milestone tracking.
