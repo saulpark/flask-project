@@ -4,6 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Keep your replies extremly concice and focus on conveying the key information. No unnecessary fluff, no long code snippets.
 
+Whenever working with any third-party library or something similar, you MUST look up the official documentation to ensure that you’re working with up-to-date information.
+
+Use the DocsExplorer subagent for efficient documentation lookup.
+
 ## Project Overview
 
 A Flask note-taking application with user authentication, CRUD notes, and public sharing via unique tokens.
@@ -20,6 +24,9 @@ A Flask note-taking application with user authentication, CRUD notes, and public
 **Not yet implemented:**
 - Quill.js (rich-text editor) — currently using plain textarea
 - Flask-Migrate / Alembic (migrations)
+- Database table initialization (`db.create_all()` not called in app factory)
+
+**Known issues:** See [AUDIT.md](AUDIT.md) for the full list of security and correctness issues pending resolution.
 
 ## Development Commands
 
@@ -89,6 +96,7 @@ app/
     routes.py          # login, register, logout
     forms.py           # LoginForm, RegisterForm
   models/
+    __init__.py        # Re-exports User, Note
     user.py            # User model (UserMixin)
     note.py            # Note model
   notes/
@@ -99,6 +107,7 @@ app/
     __init__.py        # 'users' blueprint definition
     routes.py          # User management routes
   services/
+    __init__.py        # Services package
     user_service.py    # UserService (create, authenticate, etc.)
   templates/
     base.html          # Bootstrap 5 layout, nav, flash messages
@@ -109,9 +118,16 @@ app/
     users/             # list, new, view, password
   static/
     css/style.css      # Minimal custom CSS (Bootstrap handles most)
+run.py                   # Entry point (python run.py)
+requirements.txt         # Pinned dependencies
 docker-compose.yml
 Dockerfile
-.env                   # SQLite Web password (gitignored)
+README.md
+README.docker.md
+AUDIT.md                 # Codebase audit findings and pending fixes
+TECH-SPEC.MD             # Technical specification
+.env                     # SQLite Web password (gitignored)
+.gitignore
 ```
 
 ## Important Conventions
@@ -130,7 +146,7 @@ Dockerfile
 - Password hashing via Werkzeug
 - CSRF protection on all state-changing requests
 - `@login_required` on all non-public routes
-- Notes routes use `current_user.id` (not hardcoded)
+- **WARNING:** Note ownership checks and user authorization are not yet implemented (see [AUDIT.md](AUDIT.md) #1, #2)
 
 ## Virtual Environment
 
