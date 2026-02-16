@@ -18,6 +18,8 @@ services:
       - "8080:8080"
     volumes:
       - ./instance:/app/instance
-    command: sqlite_web --host 0.0.0.0 --port 8080 instance/app.db
+    environment:
+      - SQLITE_WEB_PASSWORD=${SQLITE_WEB_PASSWORD:-Kx9#mR2vLp4!}
+    command: sqlite_web --host 0.0.0.0 --port 8080 --password instance/notes.db
     depends_on:
       - web

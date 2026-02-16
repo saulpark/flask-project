@@ -1,9 +1,11 @@
 from flask import render_template, request, redirect, url_for, flash, abort
+from flask_login import login_required
 from app.users import bp
 from app.services.user_service import UserService
 
 
 @bp.route('/')
+@login_required
 def list_users():
     """List all users."""
     users = UserService.get_all_users()
@@ -11,12 +13,14 @@ def list_users():
 
 
 @bp.route('/new', methods=['GET'])
+@login_required
 def new_user():
     """Show create user form."""
     return render_template('users/new.html')
 
 
 @bp.route('', methods=['POST'])
+@login_required
 def create_user():
     """Create a new user."""
     email = request.form.get('email', '').strip()
@@ -41,6 +45,7 @@ def create_user():
 
 
 @bp.route('/<int:id>')
+@login_required
 def view_user(id):
     """View a single user."""
     user = UserService.get_user_by_id(id)
@@ -53,6 +58,7 @@ def view_user(id):
 
 
 @bp.route('/<int:id>/password', methods=['GET'])
+@login_required
 def edit_password(id):
     """Show change password form."""
     user = UserService.get_user_by_id(id)
@@ -63,6 +69,7 @@ def edit_password(id):
 
 
 @bp.route('/<int:id>/password', methods=['POST'])
+@login_required
 def update_password(id):
     """Update user password."""
     old_password = request.form.get('old_password', '')
@@ -87,6 +94,7 @@ def update_password(id):
 
 
 @bp.route('/<int:id>/delete', methods=['POST'])
+@login_required
 def delete_user(id):
     """Delete a user."""
     try:

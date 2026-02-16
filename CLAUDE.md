@@ -6,149 +6,141 @@ Keep your replies extremly concice and focus on conveying the key information. N
 
 ## Project Overview
 
-This is a Flask web application currently serving a "Hello World" page, with plans to evolve into a full-featured note-taking application with rich-text editing, user authentication, and public sharing capabilities. See `TECH-SPEC.MD` for the complete technical specification of the planned features.
+A Flask note-taking application with user authentication, CRUD notes, and public sharing via unique tokens.
 
 **Current Stack:**
 - Flask 3.0.0 (with Blueprint pattern)
 - Python 3.12+
+- SQLAlchemy + SQLite (`notes.db`)
+- Flask-Login (session-based authentication)
+- Flask-WTF + CSRFProtect (forms & CSRF protection)
+- Bootstrap 5 + Bootstrap Icons (UI)
 - Jinja2 templates
-- Bootstrap 5 (for styling)
 
-**Planned Stack (from TECH-SPEC.MD):**
-- SQLAlchemy (ORM) + SQLite
-- Flask-Login (authentication)
-- Quill.js (rich-text editor)
-- Flask-WTF (forms & CSRF protection)
+**Not yet implemented:**
+- Quill.js (rich-text editor) — currently using plain textarea
+- Flask-Migrate / Alembic (migrations)
 
 ## Development Commands
 
 ### First-time Setup
 ```bash
-# Create virtual environment
 python -m venv venv
-
-# Activate virtual environment
-# Windows:
-venv\Scripts\activate
-# macOS/Linux:
-source venv/bin/activate
-
-# Install dependencies
+# Windows: venv\Scripts\activate
+# macOS/Linux: source venv/bin/activate
 pip install -r requirements.txt
 ```
 
 ### Running the Application
 ```bash
-# With activated venv
 python run.py
-
-# Or directly
-./venv/Scripts/python.exe run.py  # Windows
-./venv/bin/python run.py          # macOS/Linux
 ```
-
 The app runs on `http://localhost:5000` in debug mode.
+
+### Docker
+```bash
+docker-compose up --build
+```
+- Flask app: `http://localhost:5000`
+- SQLite Web UI: `http://localhost:8080` (password-protected, see `.env`)
 
 ## Architecture
 
-### Application Factory Pattern
-The app uses Flask's application factory pattern in `app/__init__.py`:
-- `create_app()` function initializes and configures the Flask app
-- Blueprints are registered within the factory
-- Allows for multiple app instances with different configs (testing, production, etc.)
+### Application Factory (`app/__init__.py`)
+- `create_app()` initializes Flask, registers extensions (`db`, `login_manager`, `csrf`), and registers all blueprints
 
-### Blueprint Pattern
-Routes are organized using Flask Blueprints (`app/routes.py`):
-- Main blueprint named `'main'` handles primary routes
-- Blueprint endpoints are prefixed: `'main.index'`, `'main.about'`
-- In templates, use `url_for('main.route_name')` not `url_for('route_name')`
+### Blueprints
+| Blueprint | Prefix | Purpose |
+|-----------|--------|---------|
+| `main` | `/` | Home, About pages |
+| `auth` | `/auth` | Login, Register, Logout |
+| `notes` | `/notes` | CRUD notes, sharing |
+| `users` | `/users` | User management |
 
-**Example:**
-```python
-# app/routes.py
-from flask import Blueprint
-bp = Blueprint('main', __name__)
+In templates, always use `url_for('blueprint.route_name')`.
 
-@bp.route('/')
-def index():
-    return render_template('index.html')
+### Extensions (`app/extensions.py`)
+- `db` — SQLAlchemy instance
+- `login_manager` — Flask-Login, `login_view="auth.login"`
+- `csrf` — CSRFProtect (all POST forms require CSRF token)
+
+### Authentication
+- All routes require `@login_required` except `auth.login`, `auth.register`, and `notes.public_note`
+- Auth forms use WTForms (`app/auth/forms.py`: `LoginForm`, `RegisterForm`)
+- `UserService.authenticate()` handles credential validation
+- Unauthenticated users are redirected to `/auth/login`
+
+### CSRF Protection
+Every POST form must include:
+```html
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 ```
+Or for WTForms: `{{ form.hidden_tag() }}`
 
-### Template Structure
-- `base.html`: Base template with navigation, includes Bootstrap 5
-- Child templates extend base using `{% extends "base.html" %}`
-- Navigation links must use blueprint-prefixed endpoints
+## Project Structure
+
+```
+app/
+  __init__.py          # Application factory
+  extensions.py        # db, login_manager, csrf
+  routes.py            # 'main' blueprint (Home, About)
+  auth/
+    __init__.py        # 'auth' blueprint definition
+    routes.py          # login, register, logout
+    forms.py           # LoginForm, RegisterForm
+  models/
+    user.py            # User model (UserMixin)
+    note.py            # Note model
+  notes/
+    __init__.py        # 'notes' blueprint definition
+    routes.py          # CRUD + share/unshare + public view
+    services.py        # NoteService business logic
+  users/
+    __init__.py        # 'users' blueprint definition
+    routes.py          # User management routes
+  services/
+    user_service.py    # UserService (create, authenticate, etc.)
+  templates/
+    base.html          # Bootstrap 5 layout, nav, flash messages
+    index.html         # Home page
+    about.html         # About page
+    auth/              # login.html, register.html
+    notes/             # list, new, edit, view, public
+    users/             # list, new, view, password
+  static/
+    css/style.css      # Minimal custom CSS (Bootstrap handles most)
+docker-compose.yml
+Dockerfile
+.env                   # SQLite Web password (gitignored)
+```
 
 ## Important Conventions
 
 ### Adding New Routes
-1. Define routes in `app/routes.py` using the `@bp.route()` decorator
-2. Update navigation in `app/templates/base.html` if needed
-3. Remember to use `url_for('main.route_name')` in templates
+1. Define in the appropriate blueprint's `routes.py`
+2. Add `@login_required` decorator (unless public)
+3. Include CSRF token in any POST forms
+4. Use `url_for('blueprint.route_name')` in templates
 
-### Future Database Work (TECH-SPEC.MD)
-When implementing the note-taking features:
-- Models will be in `app/models.py`
-- Use `extensions.py` for shared extensions (db, login_manager, etc.)
-- Organize features into blueprints: `app/auth/` and `app/notes/`
-- Use SQLAlchemy with `datetime.utcnow` for timestamp defaults
-- Store Quill Delta JSON as Text in SQLite
+### Models
+- `User` (`app/models/user.py`): email, password_hash, timestamps, `set_password()`/`check_password()`
+- `Note` (`app/models/note.py`): user_id FK, title, content_delta (JSON), is_shared, share_token, timestamps
 
-### Security Requirements (from TECH-SPEC.MD)
+### Security
 - Password hashing via Werkzeug
 - CSRF protection on all state-changing requests
-- Secure session cookies in production
-- No raw HTML injection from user input
-
-## Project Structure Evolution
-
-**Current:**
-```
-app/
-  __init__.py       # Application factory
-  routes.py         # Blueprint with routes
-  templates/        # Jinja2 templates
-  static/           # CSS, JS, images
-```
-
-**Planned (per TECH-SPEC.MD):**
-```
-app/
-  __init__.py
-  config.py
-  extensions.py     # db, login_manager, csrf
-  models.py         # User, Note models
-  auth/
-    routes.py
-    forms.py
-  notes/
-    routes.py
-    forms.py
-    services.py     # Business logic
-  templates/
-    base.html
-    auth/
-    notes/
-  static/
-migrations/         # Alembic/Flask-Migrate
-tests/
-```
+- `@login_required` on all non-public routes
+- Notes routes use `current_user.id` (not hardcoded)
 
 ## Virtual Environment
 
-The `venv/` directory contains the Python virtual environment and should:
-- Never be committed (already in `.gitignore`)
+The `venv/` directory should:
+- Never be committed (in `.gitignore`)
 - Be recreated from `requirements.txt` on new machines
-- Be activated before running any Python commands
 
 ## Git Workflow
 
-Current branches:
-- `master`: Main development branch
-- `tech_spec_definition`: Branch with technical specification
-- `initialize_claude_project`: Feature branch for initial setup
-
-When adding dependencies, update `requirements.txt`:
+When adding dependencies:
 ```bash
 pip freeze > requirements.txt
 ```

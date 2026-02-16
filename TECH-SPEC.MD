@@ -315,10 +315,10 @@ def load_user(user_id):
 
 ## 15. Milestones
 
-1. Project scaffolding + DB models + migrations
-2. Auth (register/login/logout)
-3. Notes CRUD (plain textarea first)
+1. ~~Project scaffolding + DB models + migrations~~ ✅ (models done, migrations pending)
+2. ~~Auth (register/login/logout)~~ ✅
+3. ~~Notes CRUD (plain textarea first)~~ ✅
 4. Quill integration + Delta JSON storage
-5. Sharing via token route
-6. Hardening: CSRF, security headers, basic tests
-7. UX polish (Bootstrap), empty states, flash messages
+5. ~~Sharing via token route~~ ✅
+6. ~~Hardening: CSRF, security headers, basic tests~~ ✅ (CSRF done, tests pending)
+7. ~~UX polish (Bootstrap), empty states, flash messages~~ ✅

@@ -1,25 +1,26 @@
 from flask import render_template, request, redirect, url_for, flash, abort
+from flask_login import login_required, current_user
 from app.notes import bp
 from app.notes.services import NoteService
 
-# Hardcoded user ID since auth is disabled
-CURRENT_USER_ID = 1
-
 
 @bp.route('/')
+@login_required
 def list_notes():
     """List all notes for the current user."""
-    notes = NoteService.get_all_notes(CURRENT_USER_ID)
+    notes = NoteService.get_all_notes(current_user.id)
     return render_template('notes/list.html', notes=notes)
 
 
 @bp.route('/new', methods=['GET'])
+@login_required
 def new_note():
     """Show create note form."""
     return render_template('notes/new.html')
 
 
 @bp.route('', methods=['POST'])
+@login_required
 def create_note():
     """Create a new note."""
     title = request.form.get('title', '').strip()
@@ -33,7 +34,7 @@ def create_note():
     content_delta = f'{{"ops":[{{"insert":"{content}\\n"}}]}}'
 
     try:
-        note = NoteService.create_note(CURRENT_USER_ID, title, content_delta)
+        note = NoteService.create_note(current_user.id, title, content_delta)
         flash('Note created successfully', 'success')
         return redirect(url_for('notes.view_note', id=note.id))
     except ValueError as e:
@@ -42,6 +43,7 @@ def create_note():
 
 
 @bp.route('/<int:id>')
+@login_required
 def view_note(id):
     """View a single note."""
     note = NoteService.get_note_by_id(id)
@@ -60,6 +62,7 @@ def view_note(id):
 
 
 @bp.route('/<int:id>/edit', methods=['GET'])
+@login_required
 def edit_note(id):
     """Show edit note form."""
     note = NoteService.get_note_by_id(id)
@@ -78,6 +81,7 @@ def edit_note(id):
 
 
 @bp.route('/<int:id>', methods=['POST'])
+@login_required
 def update_note(id):
     """Update an existing note."""
     title = request.form.get('title', '').strip()
@@ -100,6 +104,7 @@ def update_note(id):
 
 
 @bp.route('/<int:id>/delete', methods=['POST'])
+@login_required
 def delete_note(id):
     """Delete a note."""
     try:
@@ -112,6 +117,7 @@ def delete_note(id):
 
 
 @bp.route('/<int:id>/share', methods=['POST'])
+@login_required
 def share_note(id):
     """Enable sharing for a note."""
     try:
@@ -124,6 +130,7 @@ def share_note(id):
 
 
 @bp.route('/<int:id>/unshare', methods=['POST'])
+@login_required
 def unshare_note(id):
     """Disable sharing for a note."""
     try:
