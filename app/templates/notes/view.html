@@ -3,43 +3,50 @@
 {% block title %}{{ note.title or 'Untitled' }}{% endblock %}
 
 {% block content %}
-<h2>{{ note.title or 'Untitled' }}</h2>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">{{ note.title or 'Untitled' }}</h4>
+                {% if note.is_shared %}
+                <span class="badge bg-success">Shared</span>
+                {% else %}
+                <span class="badge bg-secondary">Private</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="text-muted small mb-3">
+                    <i class="bi bi-calendar"></i> Created: {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    &middot;
+                    <i class="bi bi-clock"></i> Updated: {{ note.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                </div>
+                <div class="border rounded p-3 bg-light">
+                    <pre class="mb-0" style="white-space: pre-wrap;">{{ content }}</pre>
+                </div>
+            </div>
+            <div class="card-footer d-flex gap-2 flex-wrap">
+                <a href="{{ url_for('notes.edit_note', id=note.id) }}" class="btn btn-primary btn-sm"><i class="bi bi-pencil"></i> Edit</a>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
+                {% if note.is_shared %}
+                <form method="POST" action="{{ url_for('notes.unshare_note', id=note.id) }}" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-warning btn-sm"><i class="bi bi-lock"></i> Unshare</button>
+                </form>
+                {% else %}
+                <form method="POST" action="{{ url_for('notes.share_note', id=note.id) }}" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-share"></i> Share</button>
+                </form>
+                {% endif %}
 
-<div class="note-meta">
-    <p><strong>Created:</strong> {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
-    <p><strong>Updated:</strong> {{ note.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
-    <p><strong>Shared:</strong> {{ 'Yes' if note.is_shared else 'No' }}</p>
-</div>
+                <form method="POST" action="{{ url_for('notes.delete_note', id=note.id) }}" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this note?')"><i class="bi bi-trash"></i> Delete</button>
+                </form>
 
-<div class="note-content">
-    <pre>{{ content }}</pre>
-</div>
-
-<div class="note-actions">
-    <a href="{{ url_for('notes.edit_note', id=note.id) }}" class="btn btn-primary">Edit</a>
-
-    {% if note.is_shared %}
-        <form method="POST" action="{{ url_for('notes.unshare_note', id=note.id) }}" style="display:inline;">
-            <button type="submit" class="btn btn-warning">Unshare</button>
-        </form>
-    {% else %}
-        <form method="POST" action="{{ url_for('notes.share_note', id=note.id) }}" style="display:inline;">
-            <button type="submit" class="btn btn-success">Share</button>
-        </form>
-    {% endif %}
-
-    <form method="POST" action="{{ url_for('notes.delete_note', id=note.id) }}" style="display:inline;">
-        <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this note?')">Delete</button>
-    </form>
-
-    <a href="{{ url_for('notes.list_notes') }}" class="btn btn-secondary">Back to Notes</a>
+                <a href="{{ url_for('notes.list_notes') }}" class="btn btn-outline-secondary btn-sm ms-auto"><i class="bi bi-arrow-left"></i> Back</a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

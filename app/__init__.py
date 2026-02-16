@@ -7,13 +7,17 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Initialize extensions
-    from app.extensions import db
+    from app.extensions import db, login_manager, csrf
     db.init_app(app)
-    # login_manager.init_app(app)  # Authentication disabled for now
+    login_manager.init_app(app)
+    csrf.init_app(app)
 
     # Register blueprints
     from app.routes import bp
     app.register_blueprint(bp)
+
+    from app.auth import bp as auth_bp
+    app.register_blueprint(auth_bp)
 
     from app.notes import bp as notes_bp
     app.register_blueprint(notes_bp)

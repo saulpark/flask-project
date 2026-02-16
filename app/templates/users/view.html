@@ -3,47 +3,61 @@
 {% block title %}{{ user.email }}{% endblock %}
 
 {% block content %}
-<h2>User Profile</h2>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="mb-4"><i class="bi bi-person-circle"></i> User Profile</h2>
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-4 fw-semibold">Email</div>
+                    <div class="col-sm-8">{{ user.email }}</div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-4 fw-semibold">User ID</div>
+                    <div class="col-sm-8">{{ user.id }}</div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-4 fw-semibold">Created</div>
+                    <div class="col-sm-8">{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-4 fw-semibold">Last Updated</div>
+                    <div class="col-sm-8">{{ user.updated_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-4 fw-semibold">Total Notes</div>
+                    <div class="col-sm-8"><span class="badge bg-info">{{ note_count }}</span></div>
+                </div>
+            </div>
+            <div class="card-footer d-flex gap-2">
+                <a href="{{ url_for('users.edit_password', id=user.id) }}" class="btn btn-primary btn-sm"><i class="bi bi-key"></i> Change Password</a>
+                <form method="POST" action="{{ url_for('users.delete_user', id=user.id) }}" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this user and all their notes?')"><i class="bi bi-trash"></i> Delete</button>
+                </form>
+                <a href="{{ url_for('users.list_users') }}" class="btn btn-outline-secondary btn-sm ms-auto"><i class="bi bi-arrow-left"></i> Back</a>
+            </div>
+        </div>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-
-<div class="user-details">
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>User ID:</strong> {{ user.id }}</p>
-    <p><strong>Created:</strong> {{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
-    <p><strong>Last Updated:</strong> {{ user.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
-    <p><strong>Total Notes:</strong> {{ note_count }}</p>
+        {% if user.notes %}
+        <div class="card shadow-sm">
+            <div class="card-header"><i class="bi bi-journal-text"></i> User's Notes</div>
+            <ul class="list-group list-group-flush">
+                {% for note in user.notes %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('notes.view_note', id=note.id) }}" class="text-decoration-none">
+                        {{ note.title or 'Untitled' }}
+                    </a>
+                    <span class="text-muted small">{{ note.updated_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
 </div>
-
-<div class="user-actions">
-    <a href="{{ url_for('users.edit_password', id=user.id) }}" class="btn btn-primary">Change Password</a>
-
-    <form method="POST" action="{{ url_for('users.delete_user', id=user.id) }}" style="display:inline;">
-        <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this user and all their notes?')">Delete User</button>
-    </form>
-
-    <a href="{{ url_for('users.list_users') }}" class="btn btn-secondary">Back to Users</a>
-</div>
-
-{% if user.notes %}
-<div class="user-notes">
-    <h3>User's Notes</h3>
-    <ul>
-        {% for note in user.notes %}
-        <li>
-            <a href="{{ url_for('notes.view_note', id=note.id) }}">
-                {{ note.title or 'Untitled' }}
-            </a>
-            - Updated: {{ note.updated_at.strftime('%Y-%m-%d %H:%M') }}
-        </li>
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
 {% endblock %}

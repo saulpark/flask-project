@@ -3,46 +3,45 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="hero">
-    <h1>Welcome to Flask Notes App</h1>
-    <p>A note-taking application with user management and sharing capabilities.</p>
+<div class="px-4 py-5 text-center bg-light rounded-3 mb-4">
+    <h1 class="display-5 fw-bold">Welcome to Flask Notes</h1>
+    <p class="lead mb-4">A note-taking application with user management and sharing capabilities.</p>
+    <a href="{{ url_for('notes.new_note') }}" class="btn btn-primary btn-lg me-2"><i class="bi bi-plus-lg"></i> New Note</a>
+    <a href="{{ url_for('notes.list_notes') }}" class="btn btn-outline-secondary btn-lg"><i class="bi bi-journal-text"></i> My Notes</a>
 </div>
 
-<div class="quick-actions">
-    <h2>Quick Actions</h2>
-
-    <div class="action-section">
-        <h3>📝 Notes</h3>
-        <ul>
-            <li><a href="{{ url_for('notes.new_note') }}">Create New Note</a> - Start writing</li>
-            <li><a href="{{ url_for('notes.list_notes') }}">View All Notes</a> - See your notes</li>
-        </ul>
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-pencil-square fs-1 text-primary"></i>
+                <h5 class="card-title mt-3">Notes</h5>
+                <p class="card-text">Create, edit, and organize your notes.</p>
+                <a href="{{ url_for('notes.new_note') }}" class="btn btn-sm btn-outline-primary">Create Note</a>
+                <a href="{{ url_for('notes.list_notes') }}" class="btn btn-sm btn-outline-secondary">View All</a>
+            </div>
+        </div>
     </div>
-
-    <div class="action-section">
-        <h3>👤 Users</h3>
-        <ul>
-            <li><a href="{{ url_for('users.new_user') }}">Create New User</a> - Register account</li>
-            <li><a href="{{ url_for('users.list_users') }}">View All Users</a> - Browse users</li>
-        </ul>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-people fs-1 text-success"></i>
+                <h5 class="card-title mt-3">Users</h5>
+                <p class="card-text">Manage user accounts and profiles.</p>
+                <a href="{{ url_for('users.new_user') }}" class="btn btn-sm btn-outline-success">New User</a>
+                <a href="{{ url_for('users.list_users') }}" class="btn btn-sm btn-outline-secondary">View All</a>
+            </div>
+        </div>
     </div>
-
-    <div class="action-section">
-        <h3>ℹ️ Information</h3>
-        <ul>
-            <li><a href="{{ url_for('main.about') }}">About</a> - Learn about this app</li>
-        </ul>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-share fs-1 text-info"></i>
+                <h5 class="card-title mt-3">Share</h5>
+                <p class="card-text">Share notes publicly with unique links.</p>
+                <a href="{{ url_for('main.about') }}" class="btn btn-sm btn-outline-info">Learn More</a>
+            </div>
+        </div>
     </div>
-</div>
-
-<div class="features">
-    <h2>Features</h2>
-    <ul>
-        <li>✅ Create, read, update, and delete notes</li>
-        <li>✅ User management with password protection</li>
-        <li>✅ Share notes publicly with unique tokens</li>
-        <li>✅ SQLite database with persistence</li>
-        <li>✅ Docker support for easy deployment</li>
-    </ul>
 </div>
 {% endblock %}
