@@ -35,17 +35,13 @@
             </div>
             <div class="card-footer d-flex gap-2">
                 <a href="{{ url_for('users.edit_password', id=user.id) }}" class="btn btn-primary btn-sm"><i class="bi bi-key"></i> Change Password</a>
-                <form method="POST" action="{{ url_for('users.delete_user', id=user.id) }}" class="d-inline">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this user and all their notes?')"><i class="bi bi-trash"></i> Delete</button>
-                </form>
-                <a href="{{ url_for('users.list_users') }}" class="btn btn-outline-secondary btn-sm ms-auto"><i class="bi bi-arrow-left"></i> Back</a>
+                <a href="{{ url_for('notes.list_notes') }}" class="btn btn-outline-secondary btn-sm ms-auto"><i class="bi bi-arrow-left"></i> Back to Notes</a>
             </div>
         </div>
 
         {% if user.notes %}
         <div class="card shadow-sm">
-            <div class="card-header"><i class="bi bi-journal-text"></i> User's Notes</div>
+            <div class="card-header"><i class="bi bi-journal-text"></i> Your Notes</div>
             <ul class="list-group list-group-flush">
                 {% for note in user.notes %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">

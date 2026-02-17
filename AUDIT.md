@@ -11,18 +11,18 @@ Evaluated against: [TECH-SPEC.MD](TECH-SPEC.MD) and official library documentati
 - **Location:** `app/notes/routes.py` (all routes)
 - **Problem:** `get_note_by_id(id)` never verifies `note.user_id == current_user.id`. Any authenticated user can view, edit, delete, share, or unshare any note by guessing an integer ID.
 - **Tech spec ref:** Section 6.3 — "Only the owner can view private notes, edit/update/delete, share/unshare."
-- **Status:** [ ] Pending
+- **Status:** [x] Fixed — `_get_own_note_or_404()` helper checks ownership; returns 403 if not owner.
 
 ### 2. No authorization on users blueprint
 - **Location:** `app/users/routes.py` (all routes)
 - **Problem:** Any authenticated user can list all users, view any profile, change any user's password, and delete any user. No admin role or ownership check exists.
-- **Status:** [ ] Pending
+- **Status:** [x] Fixed — removed list/create/delete routes; view and password restricted to own user via `_ensure_own_user()`.
 
 ### 3. Open redirect on login
 - **Location:** `app/auth/routes.py:18-19`
 - **Problem:** `next_page = request.args.get('next')` is used without validation. An attacker can craft `?next=https://evil.com` to redirect users off-site after login.
 - **Fix:** Validate that `next` is a relative URL (e.g., check `url_parse(next_page).netloc == ''`).
-- **Status:** [ ] Pending
+- **Status:** [x] Fixed — rejects `next` URLs with a netloc (external hosts).
 
 ### 4. Hardcoded SECRET_KEY
 - **Location:** `app/__init__.py:5`
@@ -38,7 +38,7 @@ Evaluated against: [TECH-SPEC.MD](TECH-SPEC.MD) and official library documentati
 - **Location:** `app/notes/routes.py:34, 95`
 - **Problem:** Content is interpolated into JSON with an f-string. If content contains `"`, `\`, or newlines, it produces malformed or exploitable JSON.
 - **Fix:** Use `json.dumps()` to safely serialize content.
-- **Status:** [ ] Pending
+- **Status:** [x] Fixed — replaced f-string with `json.dumps()`.
 
 ### 6. Wrong public share URL in flash message
 - **Location:** `app/notes/routes.py:125`
@@ -59,7 +59,7 @@ Evaluated against: [TECH-SPEC.MD](TECH-SPEC.MD) and official library documentati
 - **Location:** `app/notes/routes.py:58, 77, 157`
 - **Problem:** Bare `except:` swallows all exceptions silently.
 - **Fix:** Catch `json.JSONDecodeError` or `(ValueError, KeyError)` specifically.
-- **Status:** [ ] Pending
+- **Status:** [x] Fixed — now catches `(json.JSONDecodeError, KeyError, TypeError)`.
 
 ### 9. No max password length
 - **Location:** `app/auth/forms.py`
@@ -99,7 +99,7 @@ Evaluated against: [TECH-SPEC.MD](TECH-SPEC.MD) and official library documentati
 ### 15. import json inside functions
 - **Location:** `app/notes/routes.py:54, 74, 154`
 - **Fix:** Move to top-level import.
-- **Status:** [ ] Pending
+- **Status:** [x] Fixed — moved to top-level import.
 
 ### 16. Inefficient note count query
 - **Location:** `app/users/routes.py:56`
@@ -134,9 +134,9 @@ Evaluated against: [TECH-SPEC.MD](TECH-SPEC.MD) and official library documentati
 | Milestone | Status | Notes |
 |---|---|---|
 | DB models + migrations | Partial | Models done, no `db.create_all()` or migrations wired |
-| Auth (register/login/logout) | Done | Open redirect bug on login |
-| Notes CRUD | Done | Missing ownership authorization |
+| Auth (register/login/logout) | Done | Open redirect fixed |
+| Notes CRUD | Done | Ownership authorization added |
 | Quill.js integration | Not started | Still using plain textarea |
 | Sharing via token | Done | Wrong URL + token regeneration issue |
-| CSRF / security hardening | Partial | CSRF done; authorization checks missing |
+| CSRF / security hardening | Partial | CSRF done; note & user authorization added; open redirect fixed |
 | UX polish (Bootstrap) | Done | |

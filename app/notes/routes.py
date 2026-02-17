@@ -1,7 +1,19 @@
+import json
+
 from flask import render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
 from app.notes import bp
 from app.notes.services import NoteService
+
+
+def _get_own_note_or_404(note_id):
+    """Fetch a note and verify the current user owns it, or abort."""
+    note = NoteService.get_note_by_id(note_id)
+    if not note:
+        abort(404)
+    if note.user_id != current_user.id:
+        abort(403)
+    return note
 
 
 @bp.route('/')
@@ -30,8 +42,7 @@ def create_note():
         flash('Content is required', 'danger')
         return redirect(url_for('notes.new_note'))
 
-    # For plain textarea, wrap content in basic JSON structure
-    content_delta = f'{{"ops":[{{"insert":"{content}\\n"}}]}}'
+    content_delta = json.dumps({"ops": [{"insert": content + "\n"}]})
 
     try:
         note = NoteService.create_note(current_user.id, title, content_delta)
@@ -46,16 +57,12 @@ def create_note():
 @login_required
 def view_note(id):
     """View a single note."""
-    note = NoteService.get_note_by_id(id)
-    if not note:
-        abort(404)
+    note = _get_own_note_or_404(id)
 
-    # For now, just extract plain text from Delta JSON
-    import json
     try:
         delta = json.loads(note.content_delta)
         content = ''.join(op.get('insert', '') for op in delta.get('ops', []))
-    except:
+    except (json.JSONDecodeError, KeyError, TypeError):
         content = note.content_delta
 
     return render_template('notes/view.html', note=note, content=content)
@@ -65,16 +72,12 @@ def view_note(id):
 @login_required
 def edit_note(id):
     """Show edit note form."""
-    note = NoteService.get_note_by_id(id)
-    if not note:
-        abort(404)
+    note = _get_own_note_or_404(id)
 
-    # Extract plain text for editing
-    import json
     try:
         delta = json.loads(note.content_delta)
         content = ''.join(op.get('insert', '') for op in delta.get('ops', []))
-    except:
+    except (json.JSONDecodeError, KeyError, TypeError):
         content = note.content_delta
 
     return render_template('notes/edit.html', note=note, content=content)
@@ -84,6 +87,8 @@ def edit_note(id):
 @login_required
 def update_note(id):
     """Update an existing note."""
+    _get_own_note_or_404(id)
+
     title = request.form.get('title', '').strip()
     content = request.form.get('content', '').strip()
 
@@ -91,8 +96,7 @@ def update_note(id):
         flash('Content is required', 'danger')
         return redirect(url_for('notes.edit_note', id=id))
 
-    # Wrap content in basic JSON structure
-    content_delta = f'{{"ops":[{{"insert":"{content}\\n"}}]}}'
+    content_delta = json.dumps({"ops": [{"insert": content + "\n"}]})
 
     try:
         note = NoteService.update_note(id, title, content_delta)
@@ -107,6 +111,7 @@ def update_note(id):
 @login_required
 def delete_note(id):
     """Delete a note."""
+    _get_own_note_or_404(id)
     try:
         NoteService.delete_note(id)
         flash('Note deleted successfully', 'success')
@@ -120,6 +125,7 @@ def delete_note(id):
 @login_required
 def share_note(id):
     """Enable sharing for a note."""
+    _get_own_note_or_404(id)
     try:
         token = NoteService.share_note(id)
         flash(f'Note shared! Public link: {request.host_url}p/{token}', 'success')
@@ -133,6 +139,7 @@ def share_note(id):
 @login_required
 def unshare_note(id):
     """Disable sharing for a note."""
+    _get_own_note_or_404(id)
     try:
         NoteService.unshare_note(id)
         flash('Note unshared successfully', 'success')
@@ -149,12 +156,10 @@ def public_note(token):
     if not note:
         abort(404)
 
-    # Extract plain text from Delta JSON
-    import json
     try:
         delta = json.loads(note.content_delta)
         content = ''.join(op.get('insert', '') for op in delta.get('ops', []))
-    except:
+    except (json.JSONDecodeError, KeyError, TypeError):
         content = note.content_delta
 
     return render_template('notes/public.html', note=note, content=content)
