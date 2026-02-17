@@ -138,5 +138,5 @@ Evaluated against: [TECH-SPEC.MD](TECH-SPEC.MD) and official library documentati
 | Notes CRUD | Done | Ownership authorization added |
 | Quill.js integration | Not started | Still using plain textarea |
 | Sharing via token | Done | Wrong URL + token regeneration issue |
-| CSRF / security hardening | Partial | CSRF done; note & user authorization added; open redirect pending |
+| CSRF / security hardening | Partial | CSRF done; note & user authorization added; open redirect fixed |
 | UX polish (Bootstrap) | Done | |
