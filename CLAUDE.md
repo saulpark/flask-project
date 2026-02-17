@@ -24,7 +24,6 @@ A Flask note-taking application with user authentication, CRUD notes, and public
 **Not yet implemented:**
 - Quill.js (rich-text editor) — currently using plain textarea
 - Flask-Migrate / Alembic (migrations)
-- Database table initialization (`db.create_all()` not called in app factory)
 
 **Known issues:** See [AUDIT.md](AUDIT.md) for the full list of security and correctness issues pending resolution.
 
@@ -43,6 +42,12 @@ pip install -r requirements.txt
 python run.py
 ```
 The app runs on `http://localhost:5000` in debug mode.
+
+### Running Tests
+```bash
+python -m pytest tests/ -v
+```
+Tests use in-memory SQLite and disabled CSRF. Shared fixtures are in `tests/conftest.py`.
 
 ### Docker
 ```bash

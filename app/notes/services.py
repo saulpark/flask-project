@@ -147,7 +147,8 @@ class NoteService:
             raise ValueError("Note not found")
 
         note.is_shared = True
-        note.share_token = secrets.token_urlsafe(32)
+        if not note.share_token:
+            note.share_token = secrets.token_urlsafe(32)
         db.session.commit()
         return note.share_token
 
@@ -170,7 +171,6 @@ class NoteService:
             raise ValueError("Note not found")
 
         note.is_shared = False
-        note.share_token = None
         db.session.commit()
         return True
 

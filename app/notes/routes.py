@@ -128,7 +128,8 @@ def share_note(id):
     _get_own_note_or_404(id)
     try:
         token = NoteService.share_note(id)
-        flash(f'Note shared! Public link: {request.host_url}p/{token}', 'success')
+        public_url = url_for('notes.public_note', token=token, _external=True)
+        flash(f'Note shared! Public link: {public_url}', 'success')
         return redirect(url_for('notes.view_note', id=id))
     except ValueError as e:
         flash(str(e), 'danger')

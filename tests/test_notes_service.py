@@ -176,6 +176,21 @@ class TestNoteService:
             assert mock_note.share_token == token
             assert mock_session.commit.called
 
+    def test_share_note_preserves_existing_token(self, app_context):
+        """Test re-sharing keeps the same token instead of regenerating"""
+        with patch('app.notes.services.db.session') as mock_session:
+            mock_note = MagicMock(spec=Note)
+            mock_note.is_shared = False
+            mock_note.share_token = "existing_token_abc"
+            mock_session.get.return_value = mock_note
+
+            token = NoteService.share_note(1)
+
+            assert token == "existing_token_abc"
+            assert mock_note.is_shared is True
+            assert mock_note.share_token == "existing_token_abc"
+            assert mock_session.commit.called
+
     def test_share_note_not_found(self, app_context):
         """Test sharing non-existent note raises error"""
         with patch('app.notes.services.db.session') as mock_session:
@@ -184,8 +199,8 @@ class TestNoteService:
             with pytest.raises(ValueError, match="Note not found"):
                 NoteService.share_note(999)
 
-    def test_unshare_note_clears_token(self, app_context):
-        """Test unshare disables sharing"""
+    def test_unshare_note_keeps_token(self, app_context):
+        """Test unshare disables sharing but preserves token for re-sharing"""
         with patch('app.notes.services.db.session') as mock_session:
             mock_note = MagicMock(spec=Note)
             mock_note.is_shared = True
@@ -196,7 +211,7 @@ class TestNoteService:
 
             assert result is True
             assert mock_note.is_shared is False
-            assert mock_note.share_token is None
+            assert mock_note.share_token == "some_token"
             assert mock_session.commit.called
 
     def test_unshare_note_not_found(self, app_context):
