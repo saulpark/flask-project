@@ -25,4 +25,9 @@ def create_app():
     from app.users import bp as users_bp
     app.register_blueprint(users_bp)
 
+    # Create database tables if they don't exist
+    with app.app_context():
+        from app.models import User, Note  # noqa: F401
+        db.create_all()
+
     return app

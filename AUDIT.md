@@ -44,12 +44,12 @@ Evaluated against: [TECH-SPEC.MD](TECH-SPEC.MD) and official library documentati
 - **Location:** `app/notes/routes.py:125`
 - **Problem:** Flash shows `{request.host_url}p/{token}` but the route is at `/notes/p/<token>`.
 - **Fix:** Use `url_for('notes.public_note', token=token, _external=True)`.
-- **Status:** [ ] Pending
+- **Status:** [x] Fixed — uses `url_for()` to generate correct URL.
 
 ### 7. No db.create_all() in app factory
 - **Location:** `app/__init__.py`
 - **Problem:** Tables are never created. Flask-Migrate is installed but not initialized. Fresh deployments fail.
-- **Status:** [ ] Pending
+- **Status:** [x] Fixed — `db.create_all()` called in app factory within `app_context()`.
 
 ---
 
@@ -76,7 +76,7 @@ Evaluated against: [TECH-SPEC.MD](TECH-SPEC.MD) and official library documentati
 - **Location:** `app/notes/services.py:150`
 - **Problem:** Creates a new token every call, silently breaking existing shared links.
 - **Fix:** Only generate token if `share_token is None`.
-- **Status:** [ ] Pending
+- **Status:** [x] Fixed — only generates token when `share_token` is falsy.
 
 ### 12. Public share URL path mismatch with tech spec
 - **Tech spec ref:** Section 8.1 specifies `/p/<share_token>` but implementation uses `/notes/p/<token>`.
@@ -133,10 +133,10 @@ Evaluated against: [TECH-SPEC.MD](TECH-SPEC.MD) and official library documentati
 
 | Milestone | Status | Notes |
 |---|---|---|
-| DB models + migrations | Partial | Models done, no `db.create_all()` or migrations wired |
+| DB models + migrations | Done | Models done, `db.create_all()` wired in app factory |
 | Auth (register/login/logout) | Done | Open redirect fixed |
 | Notes CRUD | Done | Ownership authorization added |
 | Quill.js integration | Not started | Still using plain textarea |
-| Sharing via token | Done | Wrong URL + token regeneration issue |
+| Sharing via token | Done | URL and token regeneration fixed |
 | CSRF / security hardening | Partial | CSRF done; note & user authorization added; open redirect fixed |
 | UX polish (Bootstrap) | Done | |

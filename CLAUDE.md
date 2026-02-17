@@ -24,7 +24,6 @@ A Flask note-taking application with user authentication, CRUD notes, and public
 **Not yet implemented:**
 - Quill.js (rich-text editor) — currently using plain textarea
 - Flask-Migrate / Alembic (migrations)
-- Database table initialization (`db.create_all()` not called in app factory)
 
 **Known issues:** See [AUDIT.md](AUDIT.md) for the full list of security and correctness issues pending resolution.
 
