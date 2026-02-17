@@ -22,7 +22,7 @@ Evaluated against: [TECH-SPEC.MD](TECH-SPEC.MD) and official library documentati
 - **Location:** `app/auth/routes.py:18-19`
 - **Problem:** `next_page = request.args.get('next')` is used without validation. An attacker can craft `?next=https://evil.com` to redirect users off-site after login.
 - **Fix:** Validate that `next` is a relative URL (e.g., check `url_parse(next_page).netloc == ''`).
-- **Status:** [ ] Pending
+- **Status:** [x] Fixed — rejects `next` URLs with a netloc (external hosts).
 
 ### 4. Hardcoded SECRET_KEY
 - **Location:** `app/__init__.py:5`
@@ -134,7 +134,7 @@ Evaluated against: [TECH-SPEC.MD](TECH-SPEC.MD) and official library documentati
 | Milestone | Status | Notes |
 |---|---|---|
 | DB models + migrations | Partial | Models done, no `db.create_all()` or migrations wired |
-| Auth (register/login/logout) | Done | Open redirect bug on login |
+| Auth (register/login/logout) | Done | Open redirect fixed |
 | Notes CRUD | Done | Ownership authorization added |
 | Quill.js integration | Not started | Still using plain textarea |
 | Sharing via token | Done | Wrong URL + token regeneration issue |
