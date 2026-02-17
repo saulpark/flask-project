@@ -146,7 +146,8 @@ TECH-SPEC.MD             # Technical specification
 - Password hashing via Werkzeug
 - CSRF protection on all state-changing requests
 - `@login_required` on all non-public routes
-- **WARNING:** Note ownership checks and user authorization are not yet implemented (see [AUDIT.md](AUDIT.md) #1, #2)
+- Note ownership enforced via `_get_own_note_or_404()` in `app/notes/routes.py`
+- User routes restricted to own profile via `_ensure_own_user()` in `app/users/routes.py`
 
 ## Virtual Environment
 
