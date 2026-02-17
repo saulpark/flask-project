@@ -43,6 +43,12 @@ python run.py
 ```
 The app runs on `http://localhost:5000` in debug mode.
 
+### Running Tests
+```bash
+python -m pytest tests/ -v
+```
+Tests use in-memory SQLite and disabled CSRF. Shared fixtures are in `tests/conftest.py`.
+
 ### Docker
 ```bash
 docker-compose up --build

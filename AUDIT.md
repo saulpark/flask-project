@@ -140,3 +140,4 @@ Evaluated against: [TECH-SPEC.MD](TECH-SPEC.MD) and official library documentati
 | Sharing via token | Done | URL and token regeneration fixed |
 | CSRF / security hardening | Partial | CSRF done; note & user authorization added; open redirect fixed |
 | UX polish (Bootstrap) | Done | |
+| Test coverage | Done | 82 tests: auth routes, note ownership, user restrictions, services |
