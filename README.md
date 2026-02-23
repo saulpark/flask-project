@@ -148,6 +148,17 @@ pytest --cov=app
 pytest tests/test_user_service.py
 ```
 
+### Development Workflow
+
+Before committing changes, the project uses automated agents to maintain code quality and documentation:
+
+1. **TestUpdate agent** — automatically creates or updates tests to match code changes
+2. **UpdateProjectDocs agent** — updates README.md, CLAUDE.md, AUDIT.md, and TECH-SPEC.MD as needed
+
+These agents run automatically via a PreToolUse hook before git operations (commit/push). The hook also runs pytest as a final gate — commits are blocked if tests fail.
+
+See [CLAUDE.md](CLAUDE.md) Git Workflow section for details.
+
 ## Tech Spec
 
 See [TECH-SPEC.MD](TECH-SPEC.MD) for the full technical specification and milestone tracking.
