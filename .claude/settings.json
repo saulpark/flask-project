@@ -10,9 +10,9 @@
         "matcher": "Bash",
         "hooks": [
           {
-            "type": "agent",
-            "prompt": "Inspect $ARGUMENTS to get the bash command being executed. If the command contains 'git commit' or 'git push': (1) Act as the TestUpdate agent — read tests/ and relevant source files, update or add tests to cover recent changes, run `python -m pytest tests/ -v` and ensure all tests pass. (2) Act as the UpdateProjectDocs agent — read README.md, CLAUDE.md, AUDIT.md, TECH-SPEC.MD and update any sections that are stale given recent code changes. If the command does NOT contain 'git commit' or 'git push', do nothing. Return {\"ok\": true} when done, or {\"ok\": false, \"reason\": \"<details>\"} if tests fail.",
-            "timeout": 300
+            "type": "command",
+            "command": "bash .claude/hooks/pre-git.sh",
+            "timeout": 120
           }
         ]
       }

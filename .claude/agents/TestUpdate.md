@@ -69,4 +69,3 @@ For new routes, cover at minimum:
 ### Result
 {pytest output summary — pass/fail counts}
 ```
-# test hook
