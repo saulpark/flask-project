@@ -24,4 +24,3 @@ fi
 
 echo "--- Tests passed. Proceeding. ---" >&2
 exit 0
-test
