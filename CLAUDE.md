@@ -162,7 +162,16 @@ The `venv/` directory should:
 
 ## Git Workflow
 
-When adding dependencies:
+### Pre-commit Agents (MANDATORY)
+Before every `git commit` or `git push`, you MUST invoke both agents using the Task tool:
+1. **TestUpdate** (`subagent_type: TestUpdate`) — updates/adds tests to match code changes
+2. **UpdateProjectDocs** (`subagent_type: UpdateProjectDocs`) — updates README.md, CLAUDE.md, AUDIT.md, TECH-SPEC.MD
+
+Run both agents **in parallel** before staging and committing. Do NOT skip this step.
+
+The PreToolUse hook will also run `pytest` as a final gate — if tests fail, the commit is blocked.
+
+### Adding Dependencies
 ```bash
 pip freeze > requirements.txt
 ```
