@@ -52,7 +52,13 @@ flask-project/
 ├── CLAUDE.md                    # AI assistant guidance
 ├── TECH-SPEC.MD                 # Technical specification
 ├── AUDIT.md                     # Codebase audit findings
-└── README.docker.md             # Docker-specific documentation
+├── AUDIT_LOG.md                 # Audit issue history (opened/resolved dates)
+├── README.docker.md             # Docker-specific documentation
+└── .claude/
+    ├── commands/
+    │   └── CodeReview.md        # /CodeReview slash command
+    └── hooks/
+        └── pre-git.sh           # Pre-commit hook: runs pytest gate
 ```
 
 ## Setup
@@ -89,18 +95,9 @@ python run.py
 
 The app runs at `http://localhost:5000` in debug mode.
 
-### 5. Initialize the database
+### 5. Database
 
-Tables are not yet auto-created. Run manually:
-
-```python
-python
->>> from app import create_app
->>> from app.extensions import db
->>> app = create_app()
->>> with app.app_context():
-...     db.create_all()
-```
+Tables are created automatically when the app starts via `db.create_all()` in the application factory.
 
 ## Features
 
@@ -116,11 +113,11 @@ python
 
 See [AUDIT.md](AUDIT.md) for the full list. Key items:
 
-- Note ownership is not enforced (any user can access any note)
-- Users blueprint has no authorization (any user can manage all users)
+- `SECRET_KEY` and `DATABASE_URL` are hardcoded — not env-based (AUDIT #4, #21)
+- No rate limiting on the login endpoint — brute-force possible (AUDIT #18)
+- Cookie security flags not configured for production (AUDIT #19)
 - Quill.js rich-text editor not yet integrated (using plain textarea)
 - Flask-Migrate not yet wired up
-- `SECRET_KEY` is hardcoded (not env-based)
 
 ## Docker
 
@@ -156,6 +153,8 @@ Before committing changes, the project uses automated agents to maintain code qu
 2. **UpdateProjectDocs agent** — updates README.md, CLAUDE.md, AUDIT.md, and TECH-SPEC.MD as needed
 
 These agents run automatically via a PreToolUse hook before git operations (commit/push). The hook also runs pytest as a final gate — commits are blocked if tests fail.
+
+A `/CodeReview` slash command is also available for on-demand code reviews. Results are written to `AUDIT.md` and `AUDIT_LOG.md`. Optional `MODE` values: `BUGS`, `SECURITY`, `PERFORMANCE`, or combinations like `BUGS,SECURITY`.
 
 See [CLAUDE.md](CLAUDE.md) Git Workflow section for details.
 

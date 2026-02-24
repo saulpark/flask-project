@@ -315,10 +315,10 @@ def load_user(user_id):
 
 ## 15. Milestones
 
-1. ~~Project scaffolding + DB models + migrations~~ ✅ (models done, migrations pending, `db.create_all()` missing)
-2. ~~Auth (register/login/logout)~~ ⚠️ (working, but open redirect bug on `next` param — see [AUDIT.md](AUDIT.md) #3)
-3. ~~Notes CRUD (plain textarea first)~~ ⚠️ (working, but missing ownership authorization — see [AUDIT.md](AUDIT.md) #1)
+1. ~~Project scaffolding + DB models + migrations~~ ✅ (models done, `db.create_all()` wired in factory; Flask-Migrate still pending)
+2. ~~Auth (register/login/logout)~~ ✅ (open redirect fixed — AUDIT #3)
+3. ~~Notes CRUD (plain textarea first)~~ ✅ (ownership enforced via `_get_own_note_or_404()` — AUDIT #1)
 4. Quill integration + Delta JSON storage
-5. ~~Sharing via token route~~ ⚠️ (working, but share URL is wrong and token always regenerates — see [AUDIT.md](AUDIT.md) #6, #11)
-6. ~~Hardening: CSRF, security headers, basic tests~~ ⚠️ (CSRF done; authorization missing, hardcoded SECRET_KEY, tests pending — see [AUDIT.md](AUDIT.md) #2, #4)
+5. ~~Sharing via token route~~ ✅ (share URL fixed, token regeneration fixed — AUDIT #6, #11)
+6. ~~Hardening: CSRF, security headers, basic tests~~ ⚠️ (CSRF done; authorization added; SECRET_KEY hardcoded, rate limiting and cookie flags missing — AUDIT #4, #18, #19)
 7. ~~UX polish (Bootstrap), empty states, flash messages~~ ✅
