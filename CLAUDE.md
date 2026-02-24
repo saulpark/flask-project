@@ -130,9 +130,15 @@ Dockerfile
 README.md
 README.docker.md
 AUDIT.md                 # Codebase audit findings and pending fixes
+AUDIT_LOG.md             # Audit issue history (opened/resolved dates)
 TECH-SPEC.MD             # Technical specification
 .env                     # SQLite Web password (gitignored)
 .gitignore
+.claude/
+  commands/
+    CodeReview.md        # /CodeReview slash command
+  hooks/
+    pre-git.sh           # PreToolUse hook: runs pytest gate before git ops
 ```
 
 ## Important Conventions
@@ -170,6 +176,16 @@ Before every `git commit` or `git push`, you MUST invoke both agents using the T
 Run both agents **in parallel** before staging and committing. Do NOT skip this step.
 
 The PreToolUse hook will also run `pytest` as a final gate — if tests fail, the commit is blocked.
+
+### Code Review Slash Command
+Run `/CodeReview [MODE]` for an on-demand audit. Optional MODE values:
+- `BUGS` — logical/runtime bugs only
+- `SECURITY` — security issues only
+- `PERFORMANCE` — performance issues only
+- Combinations like `BUGS,SECURITY` are supported
+- Omit MODE for a full general review
+
+Results are written to `AUDIT.md` and `AUDIT_LOG.md`.
 
 ### Adding Dependencies
 ```bash

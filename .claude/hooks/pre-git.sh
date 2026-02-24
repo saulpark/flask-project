@@ -3,7 +3,7 @@
 # Receives tool input as JSON on stdin
 
 INPUT=$(cat)
-COMMAND=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('command',''))" 2>/dev/null)
+COMMAND=$(echo "$INPUT" | python -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('command',''))" 2>/dev/null)
 
 # Only act on git commit or git push
 if [[ "$COMMAND" != *"git commit"* && "$COMMAND" != *"git push"* ]]; then
